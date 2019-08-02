@@ -91,4 +91,4 @@ app :: Application
 app = serve (Proxy @API) server
 
 main :: IO ()
-main = Network.Wai.Handler.Warp.run 8080 app
+main = Network.Wai.Handler.Warp.run 7003 app
