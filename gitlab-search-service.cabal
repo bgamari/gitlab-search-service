@@ -11,7 +11,7 @@ copyright:           (c) 2019 Ben Gamari
 build-type:          Simple
 cabal-version:       >=1.10
 
-executable gitlab-redirect-service
+executable gitlab-search-service
   main-is:             Main.hs
   other-modules:       Index
   build-depends:       base >=4.12 && <4.13,
