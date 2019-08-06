@@ -10,7 +10,7 @@ import Control.Monad.IO.Class
 import Control.Monad
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Text.Megaparsec.Char.Lexer
+import Text.Megaparsec.Char.Lexer (decimal)
 
 import Servant.HTML.Lucid
 import Lucid (Html)
@@ -36,15 +36,16 @@ parseQuery :: Parsec Void String Req
 parseQuery =
   msum 
   $ map try
-  [ IssueQuery <$> maybeProj <* char '#' <*> decimal
-  , IssueQuery <$> maybeProj <* string " issue " <*> decimal
-  , MRQuery <$> maybeProj <* char '!' <*> decimal
-  , MRQuery <$> maybeProj <* string " mr " <*> decimal
-  , IssueSearchQuery <$> maybeProj <* char '#' <*> searchTerms
-  , MRSearchQuery <$> maybeProj <* char '!' <*> searchTerms
-  , MilestoneQuery <$> maybeProj <* char '%' <*> searchTerms
-  , ProjectQuery <$> project
-  , SearchQuery <$> maybeProj <* space1 <*> searchTerms
+  [ IssueQuery <$> maybeProj <* char '#' <*> decimal <* eof
+  , IssueQuery <$> maybeProj <* string " issue " <*> decimal <* eof
+  , MRQuery <$> maybeProj <* char '!' <*> decimal <* eof
+  , MRQuery <$> maybeProj <* string " mr " <*> decimal <* eof
+  , IssueSearchQuery <$> maybeProj <* char '#' <*> searchTerms <* eof
+  , MRSearchQuery <$> maybeProj <* char '!' <*> searchTerms <* eof
+  , MilestoneQuery <$> maybeProj <* char '%' <*> searchTerms <* eof
+  , ProjectQuery <$> project <* space <* eof
+  , SearchQuery <$> fmap Just project <* char '>' <* space1 <*> searchTerms <* eof
+  , SearchQuery <$> pure Nothing <*> searchTerms <* eof
   ]
   where
     maybeProj = optional project
