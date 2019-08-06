@@ -2,12 +2,14 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 import Data.Void
 import Data.Proxy
 import Data.Maybe
 import Control.Monad.IO.Class
 import Control.Monad
+import qualified Data.ByteString.Lazy.Char8 as BSL
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer (decimal)
@@ -69,7 +71,8 @@ server = serveQuery :<|> serveHome
     serveHome = pure indexPage
     serveQuery q = do
       liftIO $ print q
-      req <- either (fail . show) pure $ parse parseQuery "query string" q
+      let parseError err = throwError $ err400 { errBody = BSL.pack $ "Invalid query: " <> show err }
+      req <- either parseError pure $ parse parseQuery "query string" q
       liftIO $ print req
       let url = case req of
                   IssueQuery p n -> gitlabUrl </> defProj p </> "issues" </> show n

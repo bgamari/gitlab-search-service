@@ -15,6 +15,7 @@ executable gitlab-search-service
   main-is:             Main.hs
   other-modules:       Index
   build-depends:       base >=4.12 && <4.13,
+                       bytestring,
                        megaparsec,
                        servant,
                        servant-server,
