@@ -83,9 +83,14 @@ server = serveQuery :<|> serveHome
                   MRSearchQuery p s -> searchUrl "merge_requests" p s
                   SearchQuery p s -> searchUrl "" p s
 
-          searchUrl scope proj query = gitlabUrl </> "search?utf8=✓&scope=" <> scope <> "&search=" <> query
+          searchUrl scope proj query =
+              gitlabUrl </> "search?utf8=✓&scope=" <> scope <> "&search=" <> query <> "&project_id=" <> show projId
+            where projId = case proj of
+                             Nothing -> defaultProjectId
+                             Just projName -> defaultProjectId -- TODO: lookup project ID
           gitlabUrl = "https://gitlab.haskell.org"
           defProj = getProject . fromMaybe defaultProject
+          defaultProjectId = 1
           defaultProject = Project "ghc/ghc"
           a </> b = a ++ "/" ++ b
 
