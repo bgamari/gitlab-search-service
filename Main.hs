@@ -45,6 +45,7 @@ parseQuery =
   , IssueSearchQuery <$> maybeProj <* char '#' <*> searchTerms <* eof
   , MRSearchQuery <$> maybeProj <* char '!' <*> searchTerms <* eof
   , MilestoneQuery <$> maybeProj <* char '%' <*> searchTerms <* eof
+  , ProjectQuery <$> project <* char '>' <* space <* eof
   , ProjectQuery <$> project <* space <* eof
   , SearchQuery <$> fmap Just project <* char '>' <* space1 <*> searchTerms <* eof
   , SearchQuery <$> pure Nothing <*> searchTerms <* eof
@@ -53,10 +54,11 @@ parseQuery =
     maybeProj = optional project
     project = do
       group1 <- letterChar
-      group <- some alphaNumChar
+      group <- some projectNameChar
       char '/'
-      proj <- some alphaNumChar
+      proj <- some projectNameChar
       pure $ Project $ group1:group++"/"++proj
+    projectNameChar = alphaNumChar <|> oneOf ['.', '-']
     searchTerms = some anySingle
 
 type Get303 (cts :: [*]) (hs :: [*]) a = Verb 'GET 303 cts (Headers (Header "Location" String ': hs) a)
